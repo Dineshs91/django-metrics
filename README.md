@@ -8,6 +8,6 @@ Add it in `middleware` in `settings.py` file
 ```
 MIDDLEWARE = [
     ...
-    'common.middleware.DebugMiddleware'
+    'common.middleware.MetricsMiddleware'
 ]
 ```
