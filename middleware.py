@@ -10,10 +10,10 @@ class MetricsMiddleware:
     MetricsMiddleware adds performance metrics to the response.
 
     It adds the following
-    - Number of queries
-    - Actual sql queries
-    - duplicate queries
-    - sql total time
+      - Number of queries
+      - Actual sql queries
+      - duplicate queries
+      - sql total time
     """
     def __init__(self, get_response):
         self.get_response = get_response
