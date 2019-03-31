@@ -1,4 +1,5 @@
 import json
+import time
 
 from django.db import connection
 from django.conf import settings
@@ -10,6 +11,7 @@ class MetricsMiddleware:
     MetricsMiddleware adds performance metrics to the response.
 
     It adds the following
+      - Request processing time.
       - Number of queries
       - Actual sql queries
       - duplicate queries
@@ -19,6 +21,7 @@ class MetricsMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        self.start_time = time.time()
         response = self.get_response(request)
 
         # Add metrics only when DEBUG is True.
@@ -55,15 +58,16 @@ class MetricsMiddleware:
             'sql_total_time': sql_time
         }
 
-    @staticmethod
-    def add_metrics_to_response(response, **kwargs):
+    def add_metrics_to_response(self, response, **kwargs):
         if isinstance(response, Response) and response.get('content-type') == "application/json":
             try:
+                request_processing_time = time.time() - self.start_time
                 response.data["metrics"] = {
                     "number_of_queries": kwargs['queries_count'],
                     "sql_queries": kwargs['sql_queries'],
                     "duplicate_queries": kwargs['duplicate_queries'],
-                    "sql_total_time": kwargs['sql_total_time']
+                    "sql_total_time": kwargs['sql_total_time'],
+                    'request_processing_time': "{}s".format(round(request_processing_time, 3))
                 }
                 response.content = json.dumps(response.data)
             except TypeError as e:
